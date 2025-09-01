@@ -3,14 +3,14 @@ import { AddButton } from "src/components/AddButton";
 import { Input } from "src/components/Input";
 import { validateHeaderMax, validateHeaderMin } from "src/utils/helpers";
 import { useDispatch, useSelector } from "react-redux";
-import { addTask, uncompleteCount } from "src/store/taskSlice";
+import { addTask, canAddTask } from "src/store/taskSlice";
 
 import "./styles.css";
 
 export const NewTaskBar = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
-  const uncomplete = useSelector(uncompleteCount);
+  const canAdd = useSelector(canAddTask)
 
   const handleAdd = () => {
     if (validateHeaderMax(value)) {
@@ -20,14 +20,14 @@ export const NewTaskBar = () => {
   };
 
   const disabled =
-    !validateHeaderMin(value) || !validateHeaderMax(value) || uncomplete >= 10;
+    !validateHeaderMin(value) || !validateHeaderMax(value) || !canAdd;
 
   return (
     <div className="new-task-bar">
       <Input
         value={value}
         onChange={(val) => setValue(val)}
-        disabled={uncomplete >= 10}
+        disabled={!canAdd}
         disabledMessage="Нельзя завести больше 10 невыполненных задач"
       />
       <AddButton onClick={handleAdd} disabled={disabled} />

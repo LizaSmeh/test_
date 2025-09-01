@@ -1,5 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { List } from "src/components/List";
+import { JestStoreProvider } from "../utils/JestStoreProvider";
+import { NewTaskBar } from "src/modules/NewTaskBar";
+import { canAddTask } from "src/store/taskSlice";
+
+
 
 it("отображение списка задач", () => {
   const onDelete = jest.fn();
@@ -37,5 +42,38 @@ it("отображение списка задач", () => {
 });
 
 it("Список содержит не больше 10 невыполненных задач", () => {
+  const { getByRole } = render(<NewTaskBar />, {
+    wrapper: JestStoreProvider,
+  });
 
+  const buttonElement = getByRole("button", { name: /добавить задачу/i });
+
+  expect(buttonElement).toBeDisabled();
 });
+
+it("canAddTask возвращает false, если 10 невыполненных задач", () => {
+  const state = {
+    taskList: {
+      list: Array.from({length: 10}, (item, i) => ({
+        id: String(i),
+        header: `Task ${i+1}`,
+        done: false
+      })), notification: '',
+    }
+  }
+
+  expect(canAddTask(state)).toBe(false)
+})
+it("canAddTask возвращает true, если меньше 10 невыполненных задач", () => {
+  const state = {
+    taskList: {
+      list: Array.from({length: 9}, (item, i) => ({
+        id: String(i),
+        header: `Task ${i+1}`,
+        done: false
+      })), notification: '',
+    }
+  }
+
+  expect(canAddTask(state)).toBe(true)
+})
